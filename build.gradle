@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation 'com.google.guava:guava:28.2-jre'
+    implementation 'info.picocli:picocli:4.3.1'
+    testImplementation 'junit:junit:4.12'
+}
+// Include dependent libraries in archive.
+mainClassName = "io.github.jzdayz.Files"
+
+jar {
+    manifest {
+        attributes "Main-Class": "$mainClassName"
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
