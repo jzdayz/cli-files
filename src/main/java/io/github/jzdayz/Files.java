@@ -1,5 +1,6 @@
 package io.github.jzdayz;
 
+import org.springframework.util.AntPathMatcher;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -7,9 +8,6 @@ import picocli.CommandLine.Parameters;
 
 import java.io.File;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
 
 @Command(name = "checksum", mixinStandardHelpOptions = true, version = "checksum 4.0",
          description = "Prints the checksum (MD5 by default) of a file to STDOUT.")
@@ -18,8 +16,10 @@ class Files implements Callable<Integer> {
     @Parameters(index = "0", description = "The file whose checksum to calculate.")
     private File file;
 
-    @Option(names = {"-a", "--algorithm"}, description = "MD5, SHA-1, SHA-256, ...")
-    private String algorithm = "MD5";
+    @Option(names = {"-n", "--name"}, description = "ant")
+    private String ant = "*";
+
+    private AntPathMatcher matcher = new AntPathMatcher();
 
     // this example implements Callable, so parsing, error handling and handling user
     // requests for usage help or version help can be done with one line of code.
@@ -53,7 +53,9 @@ class Files implements Callable<Integer> {
                 action(()->show(path.toFile()));
             });
         }
-        System.out.println(file);
+        if (matcher.match(ant,file.getName())) {
+            System.out.println(file);
+        }
         return file.length();
     }
 
